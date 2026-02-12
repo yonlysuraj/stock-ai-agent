@@ -8,6 +8,8 @@ Responsibilities:
 - Return clean dict with latest indicator values
 """
 
+from typing import List, Dict, Optional
+
 def compute_rsi(prices: List[float], period: int = 14) -> float:
     if len(prices) < period + 1:
         return 50.0
