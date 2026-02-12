@@ -1,15 +1,9 @@
 # FastAPI & Web Server
 fastapi>=0.100.0
-# uvicorn is provided by Vercel runtime
-# uvicorn[standard]>=0.23.0 
 python-multipart>=0.0.6
 
-# Data Processing
-pandas>=2.0.0
-numpy>=1.24.0
-
-# Stock Data
-yfinance>=0.2.30
+# HTTP Requests (replaces yfinance/pandas)
+requests>=2.31.0
 
 # LLM & APIs
 groq>=0.4.1
@@ -18,15 +12,10 @@ groq>=0.4.1
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
 
-# Database (optional for MVP, but needed by dependencies.py)
-# sqlalchemy>=2.0.0
-
 # Environment Variables
 python-dotenv>=1.0.0
 
 # Authentication & Security
 PyJWT>=2.8.0
 
-# Development (optional)
-# pytest>=7.0.0
-# httpx>=0.24.0
+# Removed: pandas, numpy, yfinance, sqlalchemy, uvicorn
