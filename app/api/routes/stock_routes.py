@@ -11,13 +11,12 @@ Responsibilities:
 
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, Any, List
-import yfinance as yf
+import os
 from app.agents.planner_agent import analyze_stock
 from app.agents.report_agent import ReportAgent
 from app.agents.sentiment_agent import SentimentAgent
 from app.api.schemas.request import StockAnalysisRequest
 from pydantic import BaseModel
-import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -230,61 +229,16 @@ async def get_stock_news(
     limit: int = Query(10, description="Max number of news items", ge=1, le=20)
 ) -> Dict[str, Any]:
     """
-    Fetch recent financial news for a stock ticker using Yahoo Finance (free).
+    Fetch recent financial news for a stock ticker using lightweight service.
     
     Endpoint: GET /api/stocks/news/{symbol}
-    
-    Args:
-        symbol: Stock ticker symbol (e.g., "AAPL")
-        limit: Max number of news items to return (default: 10, max: 20)
-    
-    Returns:
-        List of news articles with title, description, source, date, url, thumbnail
     """
     if not symbol or len(symbol) > 12:
         raise HTTPException(status_code=400, detail="Invalid stock symbol")
     
     try:
-        ticker = yf.Ticker(symbol)
-        raw_news = ticker.news or []
-        
-        articles = []
-        for item in raw_news[:limit]:
-            content = item.get("content", {})
-            if not content:
-                continue
-            
-            # Extract thumbnail URL
-            thumbnail = None
-            thumb_data = content.get("thumbnail")
-            if thumb_data:
-                resolutions = thumb_data.get("resolutions", [])
-                if resolutions:
-                    thumbnail = resolutions[-1].get("url")  # highest resolution
-            
-            # Extract article URL
-            url = None
-            click_url = content.get("clickThroughUrl")
-            if click_url:
-                url = click_url.get("url")
-            if not url:
-                canonical = content.get("canonicalUrl")
-                if canonical:
-                    url = canonical.get("url")
-            
-            # Extract provider name
-            provider = content.get("provider", {})
-            source = provider.get("displayName", "Unknown")
-            
-            articles.append({
-                "id": content.get("id", ""),
-                "title": content.get("title", ""),
-                "description": content.get("description", ""),
-                "source": source,
-                "date": content.get("pubDate", ""),
-                "url": url,
-                "thumbnail": thumbnail,
-            })
+        from app.services.yahoo_finance import fetch_stock_news_rich
+        articles = fetch_stock_news_rich(symbol, limit=limit)
         
         return {
             "status": "success",

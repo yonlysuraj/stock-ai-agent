@@ -10,8 +10,14 @@ def fetch_stock_data(symbol, period="1y"):
     """
     try:
         # 1. Convert period to interval and range
-        interval = "1d"
         range_param = period
+        interval = "1d"
+        
+        if period in ["1d", "5d"]:
+            interval = "15m"
+        elif period in ["1mo", "3mo"]:
+            interval = "1d" # Explicitly 1d
+
         
         # Yahoo API endpoint
         url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
@@ -61,12 +67,12 @@ def fetch_stock_data(symbol, period="1y"):
         print(f"Error fetching data for {symbol}: {e}")
         return []
 
-def fetch_stock_news_manual(symbol, limit=5):
+def fetch_stock_news_rich(symbol, limit=5):
     """
-    Fetch news from Yahoo Finance Search API.
+    Fetch rich news objects for the frontend.
+    Returns list of dicts: {title, description, source, date, url, thumbnail}
     """
     try:
-        # Search API often returns news
         url = f"https://query1.finance.yahoo.com/v1/finance/search"
         params = {
             "q": symbol,
@@ -74,19 +80,44 @@ def fetch_stock_news_manual(symbol, limit=5):
             "newsCount": limit
         }
         headers = {
-            "User-Agent": "Mozilla/5.0"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
         
         response = requests.get(url, params=params, headers=headers)
         data = response.json()
         
-        texts = []
+        articles = []
         if "news" in data:
             for item in data["news"]:
-                title = item.get("title", "")
-                link = item.get("link", "")
-                texts.append(f"{title}. {link}")
+                # Extract image if available
+                thumbnail = None
+                if "thumbnail" in item and "resolutions" in item["thumbnail"]:
+                    res = item["thumbnail"]["resolutions"]
+                    if res:
+                        thumbnail = res[-1]["url"]
                 
-        return texts
-    except Exception:
+                pub_date = ""
+                if "providerPublishTime" in item:
+                    pub_date = datetime.fromtimestamp(item["providerPublishTime"]).isoformat()
+
+                articles.append({
+                    "id": item.get("uuid", ""),
+                    "title": item.get("title", ""),
+                    "description": item.get("type", ""), # Search API doesn't give full desc
+                    "source": item.get("publisher", "Yahoo Finance"),
+                    "date": pub_date,
+                    "url": item.get("link", ""),
+                    "thumbnail": thumbnail
+                })
+        return articles
+    except Exception as e:
+        print(f"Error fetching news for {symbol}: {e}")
         return []
+
+def fetch_stock_news_manual(symbol, limit=5):
+    """
+    Fetch news strings for Sentiment Analysis agent.
+    Returns list of strings: "Title. Link"
+    """
+    rich_news = fetch_stock_news_rich(symbol, limit)
+    return [f"{a['title']}. {a['url']}" for a in rich_news]
