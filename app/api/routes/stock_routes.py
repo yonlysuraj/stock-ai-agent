@@ -241,7 +241,7 @@ async def get_stock_news(
     Returns:
         List of news articles with title, description, source, date, url, thumbnail
     """
-    if not symbol or len(symbol) > 5:
+    if not symbol or len(symbol) > 12:
         raise HTTPException(status_code=400, detail="Invalid stock symbol")
     
     try:

@@ -118,6 +118,7 @@ stock-ai-agent/
 
 ## 🧠 How It Works
 
+
 ### Data Flow
 
 ```
@@ -138,6 +139,58 @@ planner_agent.analyze_stock("AAPL")
         ↓
 JSON Response (HTTP 200/400)
 ```
+
+---
+
+## 🤖 The Agentic Advantage
+
+This project is not just a standard stock dashboard; it is built on an **Agentic AI Architecture**. Unlike traditional tools that simply display data, this system mimics the workflow of a human investment research team.
+
+### What Makes It "Agentic"?
+An **Agentic System** is composed of autonomous or semi-autonomous entities ("agents") that have specific roles, tools, and goals. They interact with each other to solve complex problems that a single script cannot easily handle.
+
+### 🏆 How It Is Different
+
+| Feature | 📉 Traditional Stock Tools | 🧠 Stock AI Agent (Agentic) |
+| :--- | :--- | :--- |
+| **Architecture** | Monolithic script or simple CRUD app | **Multi-Agent System (MAS)** where specialized agents collaborate |
+| **Logic** | Static hardcoded rules (if X then Y) | **Dynamic Reasoning** combining quantitative data with qualitative sentiment |
+| **Flexibility** | Rigid; difficult to add new data sources | **Modular**; easily plug in a "News Agent" or "Macro Agent" without breaking the core |
+| **Context** | Looks at numbers in isolation | **Synthesizes Context**; weighs technicals against market sentiment |
+| **Outcome** | Raw Data (Charts & Tables) | **Actionable Intelligence** (Buy/Sell signals with confidence scores) |
+
+### 👥 Meet The Agents
+
+The system is orchestrated by a team of specialized agents:
+
+1.  **📋 Planner Agent (The Manager)**
+    *   **Role**: Orchestrates the entire workflow. It acts as the "Project Manager."
+    *   **Behavior**: break down the user request ("Analyze AAPL"), delegates tasks to sub-agents, aggregates their findings, and ensures the final report is delivered.
+    *   **Agentic Trait**: It handles errors gracefully. If the Sentiment Agent fails (e.g., API down), the Planner decides to proceed with just Technical Analysis rather than crashing.
+
+2.  **🕵️ Data Agent (The Researcher)**
+    *   **Role**: accurate data retrieval.
+    *   **Behavior**: Fetches OHLCV price data and financial news. It handles API rate limits, data cleaning, and validation.
+
+3.  **📊 Indicator Agent (The Quant)**
+    *   **Role**: Pure mathematical analysis.
+    *   **Behavior**: Computes complex technical indicators (RSI, Bollinger Bands, MACD). It doesn't "care" about the stock name, only the math.
+
+4.  **🧠 Sentiment Agent (The Analyst)**
+    *   **Role**: Qualitative analysis using LLMs (Groq/Llama-3).
+    *   **Behavior**: Reads news headlines, understands context (e.g., "earnings beat" vs "lawsuit"), and assigns a sentiment score (-1 to +1). It adds the "human" element that raw charts miss.
+
+5.  **⚖️ Decision Agent (The Trader)**
+    *   **Role**: synthesizing information to make a final call.
+    *   **Behavior**: It weighs inputs from the *Quant* (Indicators) and the *Analyst* (Sentiment) to form a weighted probability.
+    *   **Agentic Trait**: It resolves conflicts. If Technicals say "Buy" but Sentiment says "Strong Sell," it lowers the confidence score, mimicking cautious human judgment.
+
+6.  **📝 Report Agent (The Writer)**
+    *   **Role**: Communication.
+    *   **Behavior**: Takes the raw JSON decision and translates it into a human-readable narrative, generating the final dashboard report.
+
+---
+
 
 ### Trading Rules
 

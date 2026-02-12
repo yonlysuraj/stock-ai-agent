@@ -37,33 +37,78 @@ export default function SentimentPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCompany, setSelectedCompany] = useState('ALL');
 
-    const popularTickers = ['AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN', 'GOOGL', 'META', 'NFLX'];
+    const [availableTickers, setAvailableTickers] = useState([
+        'AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN', 'GOOGL', 'META', 'NFLX'
+    ]);
+    const [isSearching, setIsSearching] = useState(false);
 
-    // Fetch news from all popular tickers on mount
+    // Fetch news from all initial tickers on mount
     useEffect(() => {
         fetchAllNews();
     }, []);
 
-    // Filter articles based on search and company
+    // Handle search button click
+    const handleSearchClick = async () => {
+        const query = searchQuery.trim().toUpperCase();
+
+        if (!query || query.length < 1) {
+            setError('Please enter a ticker symbol');
+            setTimeout(() => setError(null), 3000);
+            return;
+        }
+
+        // If already in list, just select it
+        if (availableTickers.includes(query)) {
+            setSelectedCompany(query);
+            setSearchQuery('');
+            return;
+        }
+
+        // Fetch news for new ticker
+        setIsSearching(true);
+        try {
+            const res = await getStockNews(query, 10);
+            if (res.articles && res.articles.length > 0) {
+                const newArticles = res.articles.map(article => ({
+                    ...article,
+                    ticker: query
+                }));
+
+                setArticles(prev => [...prev, ...newArticles]);
+                setAvailableTickers(prev => [...prev, query]);
+                setSelectedCompany(query);
+                setSearchQuery('');
+            } else {
+                setError(`No news found for ${query}`);
+                setTimeout(() => setError(null), 3000);
+            }
+        } catch (err) {
+            console.error(`Failed to fetch news for ${query}:`, err);
+            setError(`Failed to find news for ${query}`);
+            setTimeout(() => setError(null), 3000);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    // Handle Enter key press
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearchClick();
+        }
+    };
+
+    // Filter articles based on company dropdown only
     useEffect(() => {
         let filtered = articles;
 
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(
-                (article) =>
-                    article.title.toLowerCase().includes(query) ||
-                    article.description?.toLowerCase().includes(query) ||
-                    article.source.toLowerCase().includes(query)
-            );
-        }
-
+        // Only filter by selected company from dropdown
         if (selectedCompany !== 'ALL') {
             filtered = filtered.filter((article) => article.ticker === selectedCompany);
         }
 
         setFilteredArticles(filtered);
-    }, [searchQuery, selectedCompany, articles]);
+    }, [selectedCompany, articles]);
 
     const fetchAllNews = async () => {
         setLoading(true);
@@ -71,7 +116,7 @@ export default function SentimentPage() {
         try {
             const allArticles = [];
             // Fetch news from multiple tickers in parallel
-            const promises = popularTickers.map(async (ticker) => {
+            const promises = availableTickers.map(async (ticker) => {
                 try {
                     const res = await getStockNews(ticker, 5); // Get 5 articles per ticker
                     return (res.articles || []).map((article) => ({
@@ -161,11 +206,20 @@ export default function SentimentPage() {
                     <Search className="search-icon" size={16} />
                     <input
                         type="text"
-                        placeholder="Search news..."
+                        placeholder="Enter company ticker (e.g. KO, DIS, TSLA)..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={handleKeyPress}
                         className="search-input"
+                        disabled={isSearching}
                     />
+                    <button
+                        onClick={handleSearchClick}
+                        disabled={isSearching}
+                        className="search-button"
+                    >
+                        {isSearching ? <Loader2 size={16} className="spinning" /> : 'Search'}
+                    </button>
                 </div>
 
                 <div className="company-filter">
@@ -176,7 +230,7 @@ export default function SentimentPage() {
                         className="company-select"
                     >
                         <option value="ALL">All Companies</option>
-                        {popularTickers.map((ticker) => (
+                        {availableTickers.map((ticker) => (
                             <option key={ticker} value={ticker}>
                                 {ticker}
                             </option>

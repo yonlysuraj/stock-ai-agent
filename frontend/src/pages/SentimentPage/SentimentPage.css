@@ -12,6 +12,9 @@
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .sentiment-title {
@@ -23,12 +26,15 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-3);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
 .sentiment-subtitle {
     font-size: var(--font-size-md);
     color: var(--gray-500);
+    text-align: center;
+    margin: 0 auto;
+    max-width: 600px;
 }
 
 /* ===== Filters Section ===== */
@@ -37,8 +43,11 @@
     gap: var(--space-3);
     margin-bottom: var(--space-6);
     align-items: center;
-    max-width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 
 .search-bar {
     flex: 1;
@@ -74,6 +83,38 @@
 .search-input::placeholder {
     color: var(--gray-400);
 }
+
+.search-button {
+    margin-left: var(--space-2);
+    padding: var(--space-2) var(--space-5);
+    background: var(--gray-900);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.search-button:hover:not(:disabled) {
+    background: var(--gray-800);
+    transform: translateY(-1px);
+}
+
+.search-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.search-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 
 .company-filter {
     display: flex;
