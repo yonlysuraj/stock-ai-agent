@@ -49,13 +49,10 @@ async def health_check():
     }
 
 
-@app.get("/")
-async def root():
+@app.get("/api")
+async def api_root():
     """
-    Root endpoint - API information.
-    
-    Returns:
-        API documentation and usage info
+    Root API endpoint - Information about the API.
     """
     return {
         "name": settings.API_TITLE,
@@ -69,6 +66,28 @@ async def root():
             "sentiment": "/api/stocks/sentiment/analyze (POST)"
         }
     }
+
+
+@app.get("/")
+async def root():
+    """
+    Root endpoint to handle cases where frontend static files are not served.
+    """
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content="""
+    <html>
+        <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+            <h1>Stock AI Agent - Backend API</h1>
+            <p>You are seeing this page because you hit the Backend server directly.</p>
+            <div style="margin: 20px;">
+                <p><strong>To use the App (Frontend):</strong></p>
+                <p>Running locally? Ensure you started the frontend with <code>npm run dev</code> (usually at <a href="http://localhost:5173">http://localhost:5173</a>).</p>
+                <p>Deployed on Vercel? Check your <strong>Output Directory</strong> settings (should be <code>frontend/dist</code>).</p>
+            </div>
+            <p><strong>To explore the API:</strong> <a href="/docs">/docs</a></p>
+        </body>
+    </html>
+    """)
 
 
 if __name__ == "__main__":
