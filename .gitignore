@@ -1,0 +1,79 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+stock_ai_agent.log
+
+# Coverage
+.coverage
+htmlcov/
+
+# Testing
+.pytest_cache/
+.tox/
+
+# Docker
+.dockerignore
+
+# Cache
+.cache/
+*.cache
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Gemini
+.gemini/

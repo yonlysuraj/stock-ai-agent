@@ -1,0 +1,125 @@
+.dashboard {
+    min-height: calc(100vh - 56px);
+}
+
+.dashboard-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 var(--space-6) var(--space-16);
+}
+
+/* ===== Loading State ===== */
+.loading-state {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-16) 0;
+}
+
+.loading-card {
+    text-align: center;
+}
+
+.loading-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+}
+
+.loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-900);
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.loading-text {
+    font-size: var(--font-size-md);
+    color: var(--gray-700);
+    margin-bottom: var(--space-2);
+}
+
+.loading-subtext {
+    font-size: var(--font-size-sm);
+    color: var(--gray-400);
+}
+
+/* ===== Error State ===== */
+.error-state {
+    max-width: 520px;
+    margin: var(--space-8) auto;
+}
+
+.error-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    color: var(--danger);
+}
+
+.error-title {
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-1);
+}
+
+.error-message {
+    font-size: var(--font-size-sm);
+    opacity: 0.85;
+    line-height: 1.6;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-20) 0;
+}
+
+.empty-illustration {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+}
+
+.empty-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    border: 2px dashed var(--gray-300);
+}
+
+.empty-line {
+    width: 120px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--gray-100);
+}
+
+.empty-line.short {
+    width: 80px;
+}
+
+.empty-text {
+    font-size: var(--font-size-base);
+    color: var(--gray-400);
+    font-weight: 500;
+}

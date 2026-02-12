@@ -1,0 +1,101 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.navbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+}
+
+.navbar-brand:hover {
+    opacity: 0.8;
+}
+
+.navbar-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    background: var(--gray-900);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--gray-900);
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.navbar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--gray-500);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.navbar-link:hover {
+    color: var(--gray-900);
+    background: var(--gray-100);
+}
+
+.navbar-link.active {
+    color: var(--gray-900);
+    background: var(--gray-100);
+}
+
+.navbar-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-text {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
