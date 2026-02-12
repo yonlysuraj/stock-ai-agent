@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
     TrendingUp,
     TrendingDown,
@@ -12,6 +13,8 @@ import {
     Newspaper,
 } from 'lucide-react';
 import './AnalysisResult.css';
+import PriceChart from '../PriceChart/PriceChart';
+import { addToWatchlist, getWatchlist } from '../../services/watchlist';
 
 function getActionColor(action) {
     switch (action?.toUpperCase()) {
@@ -77,7 +80,20 @@ export default function AnalysisResult({ data, report }) {
     if (!data) return null;
 
     const { symbol, data: analysisData } = data;
-    const { current_price, indicators, decision, price_history_length } = analysisData;
+    const { current_price, indicators, decision, price_history_length, price_history } = analysisData;
+    const [inWatchlist, setInWatchlist] = useState(false);
+
+    useEffect(() => {
+        if (!symbol) return;
+        const list = getWatchlist();
+        setInWatchlist(list.includes(symbol));
+    }, [symbol]);
+
+    const handleAddToWatchlist = () => {
+        const updated = addToWatchlist(symbol);
+        setInWatchlist(updated.includes(symbol));
+    };
+
     const actionColor = getActionColor(decision.action);
     const ActionIcon = getActionIcon(decision.action);
     const rsiStatus = getRSIStatus(indicators.rsi);
@@ -93,6 +109,14 @@ export default function AnalysisResult({ data, report }) {
                             <ActionIcon size={14} />
                             {decision.action}
                         </span>
+                        <button
+                            type="button"
+                            className={`watchlist-btn ${inWatchlist ? 'added' : ''}`}
+                            onClick={handleAddToWatchlist}
+                            disabled={inWatchlist}
+                        >
+                            {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+                        </button>
                     </div>
                     <div className="result-price-group">
                         <span className="result-price">${current_price?.toFixed(2)}</span>
@@ -108,6 +132,11 @@ export default function AnalysisResult({ data, report }) {
                     </div>
                 </div>
             </div>
+
+            {/* Price History Chart (from yfinance) */}
+            {price_history && price_history.length > 0 && (
+                <PriceChart history={price_history} />
+            )}
 
             {/* Sentiment Section */}
             {analysisData.sentiment && (

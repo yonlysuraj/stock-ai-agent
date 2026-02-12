@@ -7,6 +7,7 @@ export default function Navbar() {
 
     const navLinks = [
         { to: '/', label: 'Dashboard', icon: BarChart3 },
+        { to: '/watchlist', label: 'Watchlist', icon: TrendingUp },
         { to: '/sentiment', label: 'Sentiment', icon: MessageSquareText },
     ];
 

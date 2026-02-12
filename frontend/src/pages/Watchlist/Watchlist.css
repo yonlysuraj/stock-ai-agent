@@ -1,0 +1,348 @@
+.watchlist-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+}
+
+.watchlist-header {
+  margin-bottom: var(--space-6);
+}
+
+.watchlist-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--gray-900);
+}
+
+.watchlist-subtitle {
+  margin-top: var(--space-2);
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.watchlist-add-form {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.watchlist-input-wrapper {
+  flex: 1;
+}
+
+.watchlist-input-wrapper input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  font-size: var(--font-size-sm);
+}
+
+.watchlist-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: none;
+  background: var(--gray-900);
+  color: var(--white);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.watchlist-loading {
+  margin-bottom: var(--space-4);
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.watchlist-error {
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-light);
+  color: var(--danger);
+  font-size: var(--font-size-sm);
+}
+
+.watchlist-empty {
+  margin-top: var(--space-10);
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.watchlist-empty-hint {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.watchlist-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.watchlist-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.watchlist-card-symbol {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--gray-900);
+}
+
+.watchlist-card-remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--gray-400);
+}
+
+.watchlist-card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.watchlist-price {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.watchlist-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.watchlist-action.buy {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.watchlist-action.sell {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.watchlist-action.hold {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.watchlist-metrics {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.watchlist-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.metric-rsi-bar {
+  width: 72px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--gray-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-rsi-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+}
+
+.metric-rsi-bar.oversold::after {
+  left: 0;
+  right: 50%;
+  background: #22c55e;
+}
+
+.metric-rsi-bar.overbought::after {
+  left: 50%;
+  right: 0;
+  background: #ef4444;
+}
+
+.metric-rsi-bar.neutral::after {
+  left: 20%;
+  right: 20%;
+  background: #facc15;
+}
+
+.watchlist-card-placeholder {
+  font-size: var(--font-size-xs);
+  color: var(--gray-400);
+}
+
+.watchlist-compare-toggle {
+  margin-top: var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--gray-300);
+  padding: 0.35rem 0.75rem;
+  font-size: var(--font-size-xs);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.watchlist-compare-toggle.active {
+  border-style: solid;
+  border-color: var(--gray-900);
+  background: #111827;
+  color: var(--white);
+}
+
+.compare-strip {
+  margin-top: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--gray-200);
+}
+
+.compare-strip-header h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.compare-strip-header p {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+}
+
+.compare-strip-row {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.compare-chip {
+  min-width: 200px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-4);
+  background: var(--white);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+.compare-symbol {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.compare-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.compare-action.buy {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.compare-action.sell {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.compare-action.hold {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.compare-confidence {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.compare-rsi {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.compare-rsi.oversold {
+  color: #16a34a;
+}
+
+.compare-rsi.overbought {
+  color: #dc2626;
+}
+
+.compare-rsi.neutral {
+  color: #ca8a04;
+}
+
+@media (max-width: 768px) {
+  .watchlist-page {
+    padding: var(--space-6) var(--space-4) var(--space-12);
+  }
+
+  .watchlist-add-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .watchlist-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

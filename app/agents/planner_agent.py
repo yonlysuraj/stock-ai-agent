@@ -7,7 +7,7 @@ Responsibilities:
 - Aggregate results and handle errors gracefully
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 import os
 from app.agents.data_agent import fetch_prices, fetch_news
 from app.agents.indicator_agent import compute_indicators
@@ -73,13 +73,36 @@ def analyze_stock(symbol: str, period: str = "1y") -> Dict:
 
         # Step 3: Compute technical indicators
         indicators = compute_indicators(df)
-        
+
         # Step 4: Make trading decision (combining Technicals + Sentiment)
         decision = decide(indicators, sentiment=sentiment_result)
-        
+
         # Get current price (latest close)
         current_price = float(df["Close"].iloc[-1])
-        
+
+        # Prepare compact price history for frontend charts (most recent 180 points)
+        history_window = df.tail(180).reset_index()
+        price_history: List[Dict] = []
+        for _, row in history_window.iterrows():
+            try:
+                ts = row[history_window.columns[0]]
+                # Convert Timestamp/Datetime to ISO string
+                date_str = ts.isoformat() if hasattr(ts, "isoformat") else str(ts)
+                price_history.append(
+                    {
+                        "date": date_str,
+                        "open": float(row.get("Open", float("nan"))),
+                        "high": float(row.get("High", float("nan"))),
+                        "low": float(row.get("Low", float("nan"))),
+                        "close": float(row.get("Close", float("nan"))),
+                        "adj_close": float(row.get("Adj Close", row.get("Adj_Close", row.get("AdjClose", row.get("Close", float("nan")))))),
+                        "volume": float(row.get("Volume", 0.0)),
+                    }
+                )
+            except Exception:
+                # Skip any rows that can't be serialized cleanly
+                continue
+
         # Aggregate and return results
         return {
             "symbol": symbol.upper(),
@@ -89,7 +112,8 @@ def analyze_stock(symbol: str, period: str = "1y") -> Dict:
                 "indicators": indicators,
                 "sentiment": sentiment_result,
                 "decision": decision,
-                "price_history_length": len(df)
+                "price_history_length": len(df),
+                "price_history": price_history,
             }
         }
     
