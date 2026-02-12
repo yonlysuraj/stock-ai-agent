@@ -456,6 +456,10 @@ docker build -t stock-ai .
 docker run -p 8000:8000 stock-ai
 ```
 
+### Vercel Deployment ☁️
+For detailed instructions on how to deploy this app for free on Vercel, check out the [Deployment Guide](DEPLOYMENT_GUIDE.md).
+
+
 ---
 
 ## 🚀 Future Enhancements
