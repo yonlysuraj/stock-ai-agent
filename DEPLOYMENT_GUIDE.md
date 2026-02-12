@@ -28,19 +28,21 @@ git push origin main
 
 ### 3. Configure Project Settings
 
-Vercel will detect the project. Uses these settings:
+Vercel might now detect this as a Node.js project because I added a `package.json` to the root. This is GOOD.
 
-*   **Framework Preset**: Select `Vite` (it usually detects this automatically).
+*   **Framework Preset**: Select `Vite` (or `Other` if `Vite` isn't an option, but `Vite` is best).
 *   **Root Directory**: Leave as `.` (the default root). 
-    *   *Note: Do NOT select `frontend` folder as root. We are deploying the whole repo.*
 
-### 4. Build & Output Settings
+### 4. Build & Output Settings (CRITICAL STEP)
 
-If the **Build Command** and **Output Directory** are not automatically detected as:
+**If you see the "Backend API" page instead of your app, this setting is wrong.**
+
+Expand **Build and Output Settings** and ensure they match EXACTLY:
+
 *   **Build Command**: `cd frontend && npm install && npm run build`
-*   **Output Directory**: `frontend/dist`
+*   **Output Directory**: `frontend/dist`  <-- **THIS IS THE MOST COMMON ERROR**
 
-Then expand **Build and Output Settings** and override them manually with the values above.
+If Vercel defaults `Output Directory` to `dist` or `public`, you **MUST** change it to `frontend/dist`.
 
 ### 5. Environment Variables
 
