@@ -2,7 +2,7 @@
     "name": "stock-ai-agent-root",
     "private": true,
     "engines": {
-        "node": "18.x"
+        "node": "22.x"
     },
     "scripts": {
         "build": "cd frontend && npm install && npm run build"
