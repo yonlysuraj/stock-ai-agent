@@ -9,6 +9,7 @@ import {
     Target,
     Shield,
     Zap,
+    Newspaper,
 } from 'lucide-react';
 import './AnalysisResult.css';
 
@@ -32,6 +33,14 @@ function getRSIStatus(rsi) {
     if (rsi < 30) return { label: 'Oversold', color: 'success' };
     if (rsi > 70) return { label: 'Overbought', color: 'danger' };
     return { label: 'Neutral', color: 'warning' };
+}
+
+function getSentimentColor(sentiment) {
+    switch (sentiment?.toUpperCase()) {
+        case 'POSITIVE': return 'success';
+        case 'NEGATIVE': return 'danger';
+        default: return 'neutral';
+    }
 }
 
 function ConfidenceBar({ confidence }) {
@@ -99,6 +108,26 @@ export default function AnalysisResult({ data, report }) {
                     </div>
                 </div>
             </div>
+
+            {/* Sentiment Section */}
+            {analysisData.sentiment && (
+                <div className="sentiment-section animate-fade-in-up delay-100">
+                    <div className={`sentiment-card ${getSentimentColor(analysisData.sentiment.overall_sentiment)}`}>
+                        <div className="sentiment-header">
+                            <div className="sentiment-title-group">
+                                <Newspaper size={20} />
+                                <h3 className="sentiment-title">Market Sentiment</h3>
+                            </div>
+                            <span className={`sentiment-badge ${getSentimentColor(analysisData.sentiment.overall_sentiment)}`}>
+                                {analysisData.sentiment.overall_sentiment} ({analysisData.sentiment.overall_score})
+                            </span>
+                        </div>
+                        <p className="sentiment-summary">
+                            {analysisData.sentiment.summary}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Indicators Grid */}
             <div className="indicators-grid stagger-children">

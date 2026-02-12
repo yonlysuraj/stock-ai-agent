@@ -3,7 +3,7 @@ Report Agent - Generates analysis reports
 
 Responsibilities:
 - Format analysis results into readable reports
-- Include summary, indicators, decision, and recommendations
+- Include summary, indicators, sentiment, decision, and recommendations
 - Add timestamp and metadata
 """
 
@@ -16,7 +16,7 @@ class ReportAgent:
     
     def __init__(self):
         """Initialize report agent"""
-        self.report_version = "1.0"
+        self.report_version = "1.1" # Bump version
     
     def generate_report(self, ticker: str, analysis_data: dict) -> Dict:
         """
@@ -27,12 +27,14 @@ class ReportAgent:
             analysis_data: Dictionary containing:
                           - current_price: float
                           - indicators: dict with rsi, ma20, macd
+                          - sentiment: dict with overall_score, summary, etc.
                           - decision: dict with action, confidence, reason
                           - price_history_length: int
         
         Returns:
             Dictionary containing formatted report with:
             - summary
+            - sentiment_analysis
             - technical_indicators
             - trading_decision
             - recommendation
@@ -49,17 +51,18 @@ class ReportAgent:
         
         data = analysis_data.get("data", {})
         indicators = data.get("indicators", {})
+        sentiment = data.get("sentiment", {})
         decision = data.get("decision", {})
         current_price = data.get("current_price", 0)
         
         # Generate summary
-        summary = self._generate_summary(ticker, current_price, decision)
+        summary = self._generate_summary(ticker, current_price, decision, sentiment)
         
         # Generate technical analysis section
         tech_analysis = self._analyze_indicators(indicators)
         
         # Generate risk assessment
-        risk_assessment = self._assess_risk(indicators, decision)
+        risk_assessment = self._assess_risk(indicators, decision, sentiment)
         
         # Generate recommendation
         recommendation = self._generate_recommendation(decision, tech_analysis, risk_assessment)
@@ -71,6 +74,12 @@ class ReportAgent:
             "report": {
                 "summary": summary,
                 "current_price": current_price,
+                "sentiment_analysis": {
+                    "overall_sentiment": sentiment.get("overall_sentiment", "N/A"),
+                    "score": sentiment.get("overall_score", 0),
+                    "summary": sentiment.get("summary", "No sentiment data available"),
+                    "confidence": sentiment.get("confidence", 0)
+                },
                 "technical_indicators": {
                     "rsi": {
                         "value": indicators.get("rsi", 0),
@@ -96,19 +105,21 @@ class ReportAgent:
             }
         }
     
-    def _generate_summary(self, ticker: str, price: float, decision: dict) -> str:
+    def _generate_summary(self, ticker: str, price: float, decision: dict, sentiment: dict) -> str:
         """Generate a text summary of the analysis"""
         action = decision.get("action", "HOLD")
         confidence = decision.get("confidence", 0)
         
-        if action == "BUY":
-            sentiment = "bullish"
-        elif action == "SELL":
-            sentiment = "bearish"
-        else:
-            sentiment = "neutral"
+        sentiment_label = sentiment.get("overall_sentiment", "neutral").lower() if sentiment else "unknown"
         
-        return f"{ticker} is trading at ${price:.2f} with a {sentiment} outlook. {action} signal with {confidence:.0%} confidence."
+        if action == "BUY":
+            bias = "bullish"
+        elif action == "SELL":
+            bias = "bearish"
+        else:
+            bias = "neutral"
+        
+        return f"{ticker} is trading at ${price:.2f} with a {bias} outlook. Sentiment is {sentiment_label}. {action} signal with {confidence:.0%} confidence."
     
     def _interpret_rsi(self, rsi: float) -> str:
         """Interpret RSI value"""
@@ -158,7 +169,7 @@ class ReportAgent:
         
         if rsi < 30:
             count += 1
-        if macd > 0:
+        if macd is not None and macd > 0:
             count += 1
         
         return count
@@ -171,7 +182,7 @@ class ReportAgent:
         
         if rsi > 70:
             count += 1
-        if macd < 0:
+        if macd is not None and macd < 0:
             count += 1
         
         return count
@@ -188,19 +199,28 @@ class ReportAgent:
         else:
             return "Mixed"
     
-    def _assess_risk(self, indicators: dict, decision: dict) -> Dict:
-        """Assess risk level based on indicators and decision"""
+    def _assess_risk(self, indicators: dict, decision: dict, sentiment: dict) -> Dict:
+        """Assess risk level based on indicators, decision, and sentiment"""
         rsi = indicators.get("rsi", 50)
         action = decision.get("action", "HOLD")
         confidence = decision.get("confidence", 0)
         
-        # Determine risk level
+        # Determine risk level from indicators
         if rsi < 20 or rsi > 80:
             risk_level = "HIGH"
         elif rsi < 30 or rsi > 70:
             risk_level = "MODERATE"
         else:
             risk_level = "LOW"
+            
+        # Adjust based on Sentiment (if available)
+        if sentiment:
+            sentiment_score = sentiment.get("overall_score", 0)
+            # High risk if sentiment contradicts action strongly
+            if action == "BUY" and sentiment_score < -0.5:
+                 risk_level = "HIGH"
+            elif action == "SELL" and sentiment_score > 0.5:
+                 risk_level = "HIGH"
         
         # Adjust for low confidence
         if confidence < 0.6:

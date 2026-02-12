@@ -101,7 +101,15 @@ class SentimentAgent:
         """
         try:
             prompt = f"""Analyze the sentiment of the following financial news text. 
-Respond in JSON format with sentiment_score (float from -1 to 1, where -1 is very negative, 0 is neutral, 1 is very positive) and interpretation (brief explanation).
+Respond in JSON format with sentiment_score (float from -1 to 1) and interpretation (brief explanation).
+
+IMPORTANT SCORING GUIDELINES:
+- Use the FULL range from -1 to 1. Don't be overly conservative.
+- Scores between -0.1 and 0.1 should ONLY be for truly neutral/mixed content
+- Clearly positive news should be 0.3 to 0.8
+- Clearly negative news should be -0.3 to -0.8  
+- Reserve -0.9 to -1.0 for extremely negative news (crashes, scandals)
+- Reserve 0.9 to 1.0 for extremely positive news (major breakthroughs)
 
 Text: {text}
 
@@ -157,20 +165,31 @@ Respond only with valid JSON in this format:
         """
         text_lower = text.lower()
         
-        positive_words = ["gain", "rise", "rally", "surge", "bull", "positive", "growth", "strong", "beat", "outperform"]
-        negative_words = ["loss", "fall", "crash", "bear", "negative", "decline", "weak", "miss", "underperform"]
+        # Expanded keyword lists for better detection
+        positive_words = [
+            "gain", "rise", "rally", "surge", "bull", "bullish", "positive", "growth", 
+            "strong", "beat", "outperform", "soar", "jump", "climb", "profit", "success",
+            "high", "up", "boost", "upgrade", "optimistic"
+        ]
+        negative_words = [
+            "loss", "fall", "crash", "bear", "bearish", "negative", "decline", "weak", 
+            "miss", "underperform", "plummet", "drop", "down", "disappoint", "concern",
+            "low", "downgrade", "pessimistic", "struggle", "fail"
+        ]
         
         positive_count = sum(1 for word in positive_words if word in text_lower)
         negative_count = sum(1 for word in negative_words if word in text_lower)
         
+        # More decisive scoring: use 0.5 instead of 0.3 for better classification
         net_score = positive_count - negative_count
-        score = 0.3 if net_score > 0 else (-0.3 if net_score < 0 else 0)
-        
-        if score > 0:
-            interpretation = "Positive sentiment detected"
-        elif score < 0:
-            interpretation = "Negative sentiment detected"
+        if net_score > 0:
+            score = min(0.5 + (net_score - 1) * 0.15, 0.9)  # Scale based on keyword count
+            interpretation = f"Positive sentiment detected ({positive_count} positive keywords)"
+        elif net_score < 0:
+            score = max(-0.5 + (net_score + 1) * 0.15, -0.9)  # Scale based on keyword count
+            interpretation = f"Negative sentiment detected ({negative_count} negative keywords)"
         else:
+            score = 0
             interpretation = "Neutral sentiment"
         
         return score, interpretation
@@ -185,9 +204,10 @@ Respond only with valid JSON in this format:
         Returns:
             Sentiment category string
         """
-        if avg_score > 0.2:
+        # Lowered threshold from 0.2 to 0.1 to reduce neutral bias
+        if avg_score > 0.1:
             return "POSITIVE"
-        elif avg_score < -0.2:
+        elif avg_score < -0.1:
             return "NEGATIVE"
         else:
             return "NEUTRAL"

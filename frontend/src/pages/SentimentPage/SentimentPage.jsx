@@ -1,7 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    MessageSquareText,
-    Plus,
     X,
     Loader2,
     TrendingUp,
@@ -12,8 +10,7 @@ import {
     Search,
     ExternalLink,
     Clock,
-    CheckCircle2,
-    ArrowRight,
+    Filter,
 } from 'lucide-react';
 import { analyzeSentiment, getStockNews } from '../../services/api';
 import './SentimentPage.css';
@@ -30,390 +27,311 @@ function timeAgo(dateStr) {
 }
 
 export default function SentimentPage() {
-    const [texts, setTexts] = useState(['']);
-    const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
-    const [error, setError] = useState(null);
-
-    // News state
-    const [newsSymbol, setNewsSymbol] = useState('');
-    const [newsLoading, setNewsLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [articles, setArticles] = useState([]);
-    const [newsError, setNewsError] = useState(null);
-    const [selectedArticles, setSelectedArticles] = useState(new Set());
+    const [filteredArticles, setFilteredArticles] = useState([]);
+    const [error, setError] = useState(null);
+    const [selectedArticle, setSelectedArticle] = useState(null);
+    const [sentimentResult, setSentimentResult] = useState(null);
+    const [analyzingArticle, setAnalyzingArticle] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCompany, setSelectedCompany] = useState('ALL');
 
-    const addText = () => setTexts([...texts, '']);
-    const removeText = (index) => setTexts(texts.filter((_, i) => i !== index));
-    const updateText = (index, value) => {
-        const newTexts = [...texts];
-        newTexts[index] = value;
-        setTexts(newTexts);
-    };
+    const popularTickers = ['AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN', 'GOOGL', 'META', 'NFLX'];
 
-    const handleAnalyze = async (textsToAnalyze) => {
-        const validTexts = (textsToAnalyze || texts).filter((t) => t.trim());
-        if (validTexts.length === 0) return;
+    // Fetch news from all popular tickers on mount
+    useEffect(() => {
+        fetchAllNews();
+    }, []);
 
+    // Filter articles based on search and company
+    useEffect(() => {
+        let filtered = articles;
+
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(
+                (article) =>
+                    article.title.toLowerCase().includes(query) ||
+                    article.description?.toLowerCase().includes(query) ||
+                    article.source.toLowerCase().includes(query)
+            );
+        }
+
+        if (selectedCompany !== 'ALL') {
+            filtered = filtered.filter((article) => article.ticker === selectedCompany);
+        }
+
+        setFilteredArticles(filtered);
+    }, [searchQuery, selectedCompany, articles]);
+
+    const fetchAllNews = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await analyzeSentiment(validTexts);
-            setResult({ ...res.analysis, analyzedTexts: validTexts });
+            const allArticles = [];
+            // Fetch news from multiple tickers in parallel
+            const promises = popularTickers.map(async (ticker) => {
+                try {
+                    const res = await getStockNews(ticker, 5); // Get 5 articles per ticker
+                    return (res.articles || []).map((article) => ({
+                        ...article,
+                        ticker, // Add ticker to each article
+                    }));
+                } catch (err) {
+                    console.error(`Failed to fetch news for ${ticker}:`, err);
+                    return [];
+                }
+            });
+
+            const results = await Promise.all(promises);
+            results.forEach((tickerArticles) => {
+                allArticles.push(...tickerArticles);
+            });
+
+            // Shuffle for variety
+            allArticles.sort(() => Math.random() - 0.5);
+            setArticles(allArticles);
+            setFilteredArticles(allArticles);
         } catch (err) {
-            setError(err.message || 'Sentiment analysis failed');
+            setError('Failed to load news');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleFetchNews = async (e) => {
-        e.preventDefault();
-        if (!newsSymbol.trim()) return;
+    const handleArticleClick = async (article) => {
+        setSelectedArticle(article);
+        setAnalyzingArticle(true);
+        setSentimentResult(null);
 
-        setNewsLoading(true);
-        setNewsError(null);
-        setSelectedArticles(new Set());
-        setResult(null);
         try {
-            const res = await getStockNews(newsSymbol.trim().toUpperCase());
-            setArticles(res.articles || []);
-            if (res.articles?.length === 0) {
-                setNewsError('No news found for this ticker.');
-            }
+            const text = article.title + (article.description ? '. ' + article.description : '');
+            const res = await analyzeSentiment([text]);
+            setSentimentResult(res.analysis);
         } catch (err) {
-            setNewsError(err.message || 'Failed to fetch news');
-            setArticles([]);
+            console.error('Sentiment analysis failed:', err);
         } finally {
-            setNewsLoading(false);
+            setAnalyzingArticle(false);
         }
     };
 
-    const toggleArticle = (index) => {
-        setSelectedArticles((prev) => {
-            const next = new Set(prev);
-            if (next.has(index)) next.delete(index);
-            else next.add(index);
-            return next;
-        });
-    };
-
-    const selectAll = () => {
-        if (selectedArticles.size === articles.length) {
-            setSelectedArticles(new Set());
-        } else {
-            setSelectedArticles(new Set(articles.map((_, i) => i)));
-        }
-    };
-
-    const analyzeSelected = () => {
-        const selectedTexts = articles
-            .filter((_, i) => selectedArticles.has(i))
-            .map((a) => a.title + (a.description ? '. ' + a.description : ''));
-        if (selectedTexts.length === 0) return;
-
-        // Also set these in the manual texts for reference
-        setTexts(selectedTexts);
-        handleAnalyze(selectedTexts);
+    const closeModal = () => {
+        setSelectedArticle(null);
+        setSentimentResult(null);
     };
 
     const getSentimentIcon = (sentiment) => {
         switch (sentiment?.toUpperCase()) {
-            case 'POSITIVE': return TrendingUp;
-            case 'NEGATIVE': return TrendingDown;
-            default: return Minus;
+            case 'POSITIVE':
+                return TrendingUp;
+            case 'NEGATIVE':
+                return TrendingDown;
+            default:
+                return Minus;
         }
     };
 
     const getSentimentColor = (sentiment) => {
         switch (sentiment?.toUpperCase()) {
-            case 'POSITIVE': return 'success';
-            case 'NEGATIVE': return 'danger';
-            default: return 'warning';
+            case 'POSITIVE':
+                return 'success';
+            case 'NEGATIVE':
+                return 'danger';
+            default:
+                return 'warning';
         }
     };
-
-    const quickTickers = ['AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN', 'GOOGL'];
 
     return (
         <div className="sentiment-page">
             <div className="sentiment-header">
                 <h1 className="sentiment-title">
                     <Sparkles size={28} />
-                    Sentiment Analysis
+                    Market Sentiment
                 </h1>
                 <p className="sentiment-subtitle">
-                    Scrape financial news and analyze sentiment with AI
+                    Explore financial news and discover AI-powered sentiment insights
                 </p>
             </div>
 
-            <div className="sentiment-content">
-                {/* ===== News Scraper Section ===== */}
-                <div className="news-scraper-section">
-                    <div className="section-label">
-                        <Newspaper size={16} />
-                        <span>Scrape News</span>
-                    </div>
-
-                    <form className="news-search-form" onSubmit={handleFetchNews}>
-                        <div className="news-search-wrapper">
-                            <Search className="news-search-icon" size={16} />
-                            <input
-                                id="news-ticker-input"
-                                type="text"
-                                className="news-search-input"
-                                placeholder="Enter stock ticker (e.g. AAPL)"
-                                value={newsSymbol}
-                                onChange={(e) => setNewsSymbol(e.target.value.toUpperCase())}
-                                maxLength={5}
-                                autoComplete="off"
-                                spellCheck={false}
-                            />
-                            <button
-                                id="fetch-news-btn"
-                                type="submit"
-                                className="news-fetch-btn"
-                                disabled={!newsSymbol.trim() || newsLoading}
-                            >
-                                {newsLoading ? (
-                                    <Loader2 size={16} className="spinning" />
-                                ) : (
-                                    <>
-                                        <Newspaper size={14} />
-                                        Fetch News
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-
-                    <div className="quick-tickers">
-                        {quickTickers.map((t) => (
-                            <button
-                                key={t}
-                                className="quick-ticker-chip"
-                                onClick={() => {
-                                    setNewsSymbol(t);
-                                    setNewsLoading(true);
-                                    setNewsError(null);
-                                    setSelectedArticles(new Set());
-                                    setResult(null);
-                                    getStockNews(t).then((res) => {
-                                        setArticles(res.articles || []);
-                                        if (res.articles?.length === 0) setNewsError('No news found.');
-                                    }).catch((err) => {
-                                        setNewsError(err.message);
-                                        setArticles([]);
-                                    }).finally(() => setNewsLoading(false));
-                                }}
-                            >
-                                {t}
-                            </button>
-                        ))}
-                    </div>
-
-                    {newsError && (
-                        <div className="news-error animate-fade-in-up">{newsError}</div>
-                    )}
-
-                    {/* News Articles List */}
-                    {articles.length > 0 && (
-                        <div className="news-results animate-fade-in-up">
-                            <div className="news-results-header">
-                                <span className="news-count">{articles.length} articles found</span>
-                                <div className="news-actions">
-                                    <button className="select-all-btn" onClick={selectAll}>
-                                        {selectedArticles.size === articles.length ? 'Deselect All' : 'Select All'}
-                                    </button>
-                                    <button
-                                        id="analyze-selected-btn"
-                                        className="analyze-selected-btn"
-                                        onClick={analyzeSelected}
-                                        disabled={selectedArticles.size === 0 || loading}
-                                    >
-                                        {loading ? (
-                                            <Loader2 size={14} className="spinning" />
-                                        ) : (
-                                            <ArrowRight size={14} />
-                                        )}
-                                        Analyze {selectedArticles.size > 0 ? `(${selectedArticles.size})` : ''}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="articles-list stagger-children">
-                                {articles.map((article, index) => (
-                                    <div
-                                        key={article.id || index}
-                                        className={`article-card ${selectedArticles.has(index) ? 'selected' : ''}`}
-                                        onClick={() => toggleArticle(index)}
-                                    >
-                                        <div className="article-checkbox">
-                                            <div className={`checkbox ${selectedArticles.has(index) ? 'checked' : ''}`}>
-                                                {selectedArticles.has(index) && <CheckCircle2 size={16} />}
-                                            </div>
-                                        </div>
-
-                                        {article.thumbnail && (
-                                            <div className="article-thumb">
-                                                <img src={article.thumbnail} alt="" loading="lazy" />
-                                            </div>
-                                        )}
-
-                                        <div className="article-content">
-                                            <h4 className="article-title">{article.title}</h4>
-                                            {article.description && (
-                                                <p className="article-desc">{article.description}</p>
-                                            )}
-                                            <div className="article-meta">
-                                                <span className="article-source">{article.source}</span>
-                                                <span className="article-date">
-                                                    <Clock size={11} />
-                                                    {timeAgo(article.date)}
-                                                </span>
-                                                {article.url && (
-                                                    <a
-                                                        href={article.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="article-link"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        <ExternalLink size={11} />
-                                                        Read
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+            {/* Filters */}
+            <div className="filters-section">
+                <div className="search-bar">
+                    <Search className="search-icon" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search news..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="search-input"
+                    />
                 </div>
 
-                {/* ===== Manual Input Section ===== */}
-                <details className="manual-section">
-                    <summary className="manual-summary">
-                        <MessageSquareText size={16} />
-                        Or type text manually
-                    </summary>
+                <div className="company-filter">
+                    <Filter size={14} />
+                    <select
+                        value={selectedCompany}
+                        onChange={(e) => setSelectedCompany(e.target.value)}
+                        className="company-select"
+                    >
+                        <option value="ALL">All Companies</option>
+                        {popularTickers.map((ticker) => (
+                            <option key={ticker} value={ticker}>
+                                {ticker}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
-                    <div className="manual-content">
-                        <div className="texts-list">
-                            {texts.map((text, index) => (
-                                <div key={index} className="text-input-row animate-fade-in-up">
-                                    <span className="text-index">{index + 1}</span>
-                                    <textarea
-                                        className="text-textarea"
-                                        placeholder="Enter financial news headline or text..."
-                                        value={text}
-                                        onChange={(e) => updateText(index, e.target.value)}
-                                        rows={2}
-                                    />
-                                    {texts.length > 1 && (
-                                        <button className="remove-text-btn" onClick={() => removeText(index)}>
-                                            <X size={14} />
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+            {/* Loading State */}
+            {loading && (
+                <div className="loading-container">
+                    <Loader2 size={32} className="spinning" />
+                    <p>Loading news from all markets...</p>
+                </div>
+            )}
 
-                        <div className="input-actions">
-                            <button className="add-text-btn" onClick={addText}>
-                                <Plus size={16} />
-                                Add Text
-                            </button>
-                            <button
-                                id="analyze-manual-btn"
-                                className="analyze-btn"
-                                onClick={() => handleAnalyze()}
-                                disabled={loading || texts.every((t) => !t.trim())}
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 size={16} className="spinning" />
-                                        Analyzing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <MessageSquareText size={16} />
-                                        Analyze
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </details>
+            {/* Error State */}
+            {error && <div className="error-message">{error}</div>}
 
-                {/* ===== Error ===== */}
-                {error && (
-                    <div className="sentiment-error animate-fade-in-up">
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {/* ===== Results ===== */}
-                {result && (
-                    <div className="sentiment-results animate-fade-in-up">
-                        <div className="overall-sentiment-card">
-                            <div className="overall-header">
-                                <h3>Overall Sentiment</h3>
-                            </div>
-                            <div className="overall-body">
-                                <div className={`overall-badge ${getSentimentColor(result.overall_sentiment)}`}>
-                                    {(() => { const Icon = getSentimentIcon(result.overall_sentiment); return <Icon size={20} />; })()}
-                                    {result.overall_sentiment}
-                                </div>
-                                <div className="overall-stats">
-                                    <div className="overall-stat">
-                                        <span className="stat-label">Score</span>
-                                        <span className="stat-value">{result.overall_score?.toFixed(2)}</span>
-                                    </div>
-                                    <div className="overall-stat">
-                                        <span className="stat-label">Texts</span>
-                                        <span className="stat-value">{result.texts_analyzed}</span>
-                                    </div>
-                                    <div className="overall-stat">
-                                        <span className="stat-label">Confidence</span>
-                                        <span className="stat-value">{(result.confidence * 100)?.toFixed(0)}%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {result.summary && (
-                                <div className="overall-summary">
-                                    <p>{result.summary}</p>
+            {/* Pinterest Grid */}
+            {!loading && !error && (
+                <div className="masonry-grid">
+                    {filteredArticles.map((article, index) => (
+                        <div
+                            key={`${article.ticker}-${article.id || index}`}
+                            className="news-card"
+                            onClick={() => handleArticleClick(article)}
+                        >
+                            {article.thumbnail && (
+                                <div className="news-card-image">
+                                    <img src={article.thumbnail} alt={article.title} loading="lazy" />
+                                    <div className="news-card-ticker">{article.ticker}</div>
                                 </div>
                             )}
-                        </div>
-
-                        {result.individual_scores && (
-                            <div className="individual-results">
-                                <h3 className="individual-title">Individual Analysis</h3>
-                                <div className="individual-list stagger-children">
-                                    {result.individual_scores.map((score, i) => (
-                                        <div key={i} className="individual-card">
-                                            <div className="individual-top">
-                                                <span className={`score-badge ${score >= 0 ? 'success' : 'danger'}`}>
-                                                    {score >= 0 ? '+' : ''}{score?.toFixed(2)}
-                                                </span>
-                                                <span className="individual-text">
-                                                    {result.analyzedTexts?.[i] || `Text ${i + 1}`}
-                                                </span>
-                                            </div>
-                                            {result.interpretations?.[i] && (
-                                                <p className="individual-interpretation">
-                                                    {result.interpretations[i]}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
+                            <div className="news-card-content">
+                                <h3 className="news-card-title">{article.title}</h3>
+                                {article.description && (
+                                    <p className="news-card-description">{article.description}</p>
+                                )}
+                                <div className="news-card-footer">
+                                    <span className="news-card-source">{article.source}</span>
+                                    <span className="news-card-date">
+                                        <Clock size={12} />
+                                        {timeAgo(article.date)}
+                                    </span>
                                 </div>
                             </div>
-                        )}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* No Results */}
+            {!loading && !error && filteredArticles.length === 0 && (
+                <div className="no-results">
+                    <Newspaper size={48} />
+                    <p>No news articles found</p>
+                </div>
+            )}
+
+            {/* Sentiment Modal */}
+            {selectedArticle && (
+                <div className="modal-overlay" onClick={closeModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={closeModal}>
+                            <X size={20} />
+                        </button>
+
+                        <div className="modal-article">
+                            {selectedArticle.thumbnail && (
+                                <img
+                                    src={selectedArticle.thumbnail}
+                                    alt={selectedArticle.title}
+                                    className="modal-image"
+                                />
+                            )}
+                            <div className="modal-ticker-badge">{selectedArticle.ticker}</div>
+                            <h2 className="modal-title">{selectedArticle.title}</h2>
+                            {selectedArticle.description && (
+                                <p className="modal-description">{selectedArticle.description}</p>
+                            )}
+                            <div className="modal-meta">
+                                <span className="modal-source">{selectedArticle.source}</span>
+                                <span className="modal-date">
+                                    <Clock size={14} />
+                                    {timeAgo(selectedArticle.date)}
+                                </span>
+                                {selectedArticle.url && (
+                                    <a
+                                        href={selectedArticle.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="modal-link"
+                                    >
+                                        <ExternalLink size={14} />
+                                        Read Full Article
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="modal-divider" />
+
+                        <div className="modal-sentiment">
+                            {analyzingArticle ? (
+                                <div className="sentiment-loading">
+                                    <Loader2 size={32} className="spinning" />
+                                    <p>Analyzing sentiment...</p>
+                                </div>
+                            ) : sentimentResult ? (
+                                <>
+                                    <h3 className="sentiment-section-title">
+                                        <Sparkles size={18} />
+                                        AI Sentiment Analysis
+                                    </h3>
+                                    <div
+                                        className={`sentiment-badge ${getSentimentColor(
+                                            sentimentResult.overall_sentiment
+                                        )}`}
+                                    >
+                                        {(() => {
+                                            const Icon = getSentimentIcon(sentimentResult.overall_sentiment);
+                                            return <Icon size={24} />;
+                                        })()}
+                                        <span className="sentiment-label">
+                                            {sentimentResult.overall_sentiment}
+                                        </span>
+                                    </div>
+
+                                    <div className="sentiment-stats">
+                                        <div className="sentiment-stat">
+                                            <span className="stat-label">Score</span>
+                                            <span className="stat-value">
+                                                {sentimentResult.individual_scores?.[0]?.toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div className="sentiment-stat">
+                                            <span className="stat-label">Confidence</span>
+                                            <span className="stat-value">
+                                                {(sentimentResult.confidence * 100)?.toFixed(0)}%
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {sentimentResult.interpretations?.[0] && (
+                                        <div className="sentiment-interpretation">
+                                            <p>{sentimentResult.interpretations[0]}</p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : null}
+                        </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
