@@ -11,32 +11,10 @@
 }
 
 .market-cards {
-    display: flex;
-    /* Use flex instead of grid for a simpler layout initially */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    /* Increased gap for easier separation */
-    overflow-x: auto;
-    /* Allow horizontal scroll if needed */
-    padding: 1rem;
-    /* Add padding on ALL sides to prevent hover crop (top, right, bottom, left) */
-    margin: -1rem;
-    /* Offset negative margin to maintain visual layout balance. Note: this might cause scrollbar overlap on sides, but prevents clipping. */
-    width: calc(100% + 2rem);
-    /* Compensate width for negative horizontal margins */
-}
-
-/* Scrollbar styling for horizontal scroll */
-.market-cards::-webkit-scrollbar {
-    height: 6px;
-}
-
-.market-cards::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 3px;
-}
-
-.market-cards::-webkit-scrollbar-track {
-    background: transparent;
+    width: 100%;
 }
 
 .market-card {
@@ -44,8 +22,6 @@
     border: 1px solid var(--border-color);
     border-radius: 14px;
     padding: 1.25rem;
-    min-width: 160px;
-    flex: 1;
     cursor: pointer;
     position: relative;
     outline: none;
@@ -168,4 +144,13 @@
 
 .change.negative {
     color: var(--danger-color, #ef4444);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .market-cards {
+        grid-template-columns: 1fr;
+        /* Force single column on small mobile */
+        gap: 1rem;
+    }
 }

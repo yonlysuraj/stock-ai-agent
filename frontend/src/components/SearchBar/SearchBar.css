@@ -20,11 +20,15 @@
     font-size: var(--font-size-md);
     color: var(--gray-500);
     font-weight: 400;
+    max-width: 90%;
+    margin: 0 auto;
 }
 
 .search-form {
     max-width: 520px;
     margin: 0 auto;
+    position: relative;
+    z-index: 10;
 }
 
 .search-input-wrapper {
@@ -57,6 +61,8 @@
     font-weight: 500;
     color: var(--gray-900);
     letter-spacing: 0.01em;
+    width: 100%;
+    /* Ensure full width */
 }
 
 .search-input::placeholder {
@@ -97,6 +103,8 @@
     justify-content: center;
     gap: var(--space-2);
     margin-top: var(--space-4);
+    flex-wrap: wrap;
+    /* Allow wrapping on small screens */
 }
 
 .period-chip {
@@ -152,4 +160,23 @@
     background: var(--gray-200);
     color: var(--gray-900);
     transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .search-section {
+        padding: var(--space-8) 0 var(--space-4);
+    }
+
+    .search-title {
+        font-size: var(--font-size-3xl);
+    }
+
+    .search-input-wrapper {
+        padding-left: var(--space-4);
+    }
+
+    .period-selector {
+        gap: var(--space-1);
+    }
 }

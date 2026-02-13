@@ -13,7 +13,6 @@
 .report-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    /* Subtle border */
     border-radius: var(--radius-premium);
     box-shadow: var(--card-shadow);
     padding: var(--space-6);
@@ -77,9 +76,10 @@
     color: #64748b;
     margin-top: 0.25rem;
     font-weight: 500;
+    text-align: right;
 }
 
-/* Action Badges - Pill Style */
+/* Action Badges */
 .action-badge {
     display: inline-flex;
     align-items: center;
@@ -204,7 +204,6 @@
     text-align: right;
 }
 
-
 /* ===== Indicators Grid ===== */
 .indicators-grid {
     display: grid;
@@ -282,6 +281,11 @@
     color: #991b1b;
 }
 
+.indicator-card.warning .indicator-icon {
+    background: #fee2e3;
+    color: #d97706;
+}
+
 
 /* ===== Sentiment Card ===== */
 .sentiment-section {
@@ -290,7 +294,6 @@
 
 .sentiment-card {
     border-left: 4px solid transparent;
-    /* Accent border */
 }
 
 .sentiment-card.success {
@@ -352,7 +355,6 @@
     max-width: 90%;
 }
 
-
 /* ===== Report Section ===== */
 .report-section {
     margin-top: var(--space-10);
@@ -382,8 +384,12 @@
 .report-indicator-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 0.75rem 0;
     border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    /* Allow wrapping */
+    gap: 0.5rem;
 }
 
 .report-indicator-row:last-child {
@@ -393,21 +399,48 @@
 .report-ind-name {
     font-weight: 600;
     color: #475569;
+    flex: 1;
+    min-width: 120px;
 }
 
 .report-ind-value {
     font-weight: 700;
     color: #0f172a;
+    margin: 0 1rem;
+}
+
+.report-ind-interpretation {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-style: italic;
+    text-align: right;
+    max-width: 40%;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+    .result-header-card {
+        padding: var(--space-4);
+    }
+
     .result-header-top {
         flex-direction: column;
         gap: var(--space-4);
     }
 
+    .result-price-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 0.5rem;
+    }
+
     .result-price {
+        text-align: left;
+        font-size: 2rem;
+    }
+
+    .result-meta {
         text-align: left;
     }
 
@@ -417,6 +450,24 @@
 
     .action-badge {
         margin-left: 0;
-        margin-top: 0.5rem;
+    }
+
+    /* Responsive Report Table */
+    .report-indicator-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        padding: 1rem 0;
+    }
+
+    .report-ind-value {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .report-ind-interpretation {
+        text-align: left;
+        max-width: 100%;
+        margin-top: 0.25rem;
     }
 }
