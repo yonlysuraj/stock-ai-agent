@@ -1,22 +1,66 @@
 /* ===== Dashboard Layout ===== */
 .dashboard {
     min-height: calc(100vh - 56px);
-    background-color: #f8fafc;
-    /* Light gray background for contrast */
+    background-color: var(--background);
+    /* Use variable for consistency */
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
 }
 
 .dashboard-container {
     max-width: 1200px;
-    /* Constrain width for better readability */
     margin: 0 auto;
-    padding: var(--space-8) var(--space-6) var(--space-16);
+    padding: 2rem 1.5rem 4rem;
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: 2rem;
 }
 
-/* ===== Loading State ===== */
+/* ===== Dashboard Home ===== */
+.dashboard-home {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* ===== Skeleton Loading (Dashboard Home) ===== */
+.dashboard-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.skeleton-bar {
+    height: 140px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-grid {
+    height: 300px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+/* ===== Loading State (Search) ===== */
 .loading-state {
     display: flex;
     flex-direction: column;
@@ -25,24 +69,21 @@
     min-height: 400px;
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(8px);
-    border-radius: var(--radius-2xl);
-    border: 1px solid var(--gray-200);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
 }
 
 .loading-dots {
     display: flex;
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
 .loading-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--primary);
-    /* Assuming primary color exists, or use generic */
-    background-color: #3b82f6;
-    /* Fallback blue */
+    background-color: var(--primary-color, #3b82f6);
     animation: bounce 1.4s infinite ease-in-out both;
 }
 
@@ -68,67 +109,60 @@
 }
 
 .loading-text {
-    font-size: var(--font-size-lg);
+    font-size: 1.125rem;
     font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
 }
 
 .loading-subtext {
-    font-size: var(--font-size-sm);
-    color: var(--gray-500);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
 /* ===== Error State ===== */
 .error-state {
     max-width: 600px;
-    margin: var(--space-12) auto;
+    margin: 3rem auto;
 }
 
 .error-card {
     display: flex;
     align-items: center;
-    gap: var(--space-5);
+    gap: 1.25rem;
     background: #fef2f2;
     border: 1px solid #fee2e2;
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
+    border-radius: 1rem;
+    padding: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.1);
-}
-
-.error-card svg {
-    color: #ef4444;
-    flex-shrink: 0;
 }
 
 .error-title {
     font-weight: 700;
     color: #991b1b;
-    margin-bottom: var(--space-1);
+    margin-bottom: 0.25rem;
 }
 
 .error-message {
     color: #b91c1c;
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem;
 }
 
 /* ===== Empty State ===== */
+/* This is now a fallback, generally unseen */
 .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 500px;
+    min-height: 300px;
     text-align: center;
-    background: white;
-    border-radius: var(--radius-2xl);
-    border: 1px dashed var(--gray-200);
-    margin-top: var(--space-8);
+    opacity: 0.8;
 }
 
 .empty-illustration {
     position: relative;
-    margin-bottom: var(--space-8);
+    margin-bottom: 2rem;
     opacity: 0.6;
 }
 
@@ -137,7 +171,7 @@
     height: 64px;
     border-radius: 50%;
     background: var(--gray-50);
-    border: 2px solid var(--gray-200);
+    border: 2px solid var(--border-color);
     margin: 0 auto;
 }
 
@@ -146,7 +180,7 @@
     height: 10px;
     background: var(--gray-100);
     border-radius: 99px;
-    margin: var(--space-4) auto 0;
+    margin: 1rem auto 0;
 }
 
 .empty-line.short {
@@ -155,7 +189,6 @@
 
 .empty-text {
     font-size: 1.125rem;
-    color: var(--gray-500);
+    color: var(--text-secondary);
     font-weight: 500;
-    max-width: 300px;
 }

@@ -1,0 +1,171 @@
+.market-overview {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.market-cards {
+    display: flex;
+    /* Use flex instead of grid for a simpler layout initially */
+    gap: 1.5rem;
+    /* Increased gap for easier separation */
+    overflow-x: auto;
+    /* Allow horizontal scroll if needed */
+    padding: 1rem;
+    /* Add padding on ALL sides to prevent hover crop (top, right, bottom, left) */
+    margin: -1rem;
+    /* Offset negative margin to maintain visual layout balance. Note: this might cause scrollbar overlap on sides, but prevents clipping. */
+    width: calc(100% + 2rem);
+    /* Compensate width for negative horizontal margins */
+}
+
+/* Scrollbar styling for horizontal scroll */
+.market-cards::-webkit-scrollbar {
+    height: 6px;
+}
+
+.market-cards::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.market-cards::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.market-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.25rem;
+    min-width: 160px;
+    flex: 1;
+    cursor: pointer;
+    position: relative;
+    outline: none;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.35s ease;
+}
+
+/* Animated gradient shimmer overlay */
+.market-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg,
+            rgba(59, 130, 246, 0.08) 0%,
+            rgba(139, 92, 246, 0.06) 50%,
+            rgba(16, 185, 129, 0.08) 100%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.market-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.market-card:hover,
+.market-card:focus-visible {
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow:
+        0 8px 24px rgba(59, 130, 246, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.market-card:hover::before,
+.market-card:focus-visible::before {
+    opacity: 1;
+}
+
+.market-card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition-duration: 0.1s;
+}
+
+.card-cta {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-color, #3b82f6);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.market-card:hover .card-cta,
+.market-card:focus-visible .card-cta {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.symbol {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+/* Trend Icons - Using semantic classes */
+.trend-icon.positive {
+    color: var(--success-color, #10b981);
+    /* Use custom property or fallback */
+}
+
+.trend-icon.negative {
+    color: var(--danger-color, #ef4444);
+    /* Use custom property or fallback */
+}
+
+
+/* Card Body */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+
+/* Change Value Styling */
+.change {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.change.positive {
+    color: var(--success-color, #10b981);
+}
+
+.change.negative {
+    color: var(--danger-color, #ef4444);
+}

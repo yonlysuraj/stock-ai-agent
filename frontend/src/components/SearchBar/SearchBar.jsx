@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, ArrowRight, Loader2 } from 'lucide-react';
 import './SearchBar.css';
 
-export default function SearchBar({ onSearch, loading }) {
-    const [symbol, setSymbol] = useState('');
+export default function SearchBar({ onSearch, loading, initialSymbol }) {
+    const [symbol, setSymbol] = useState(initialSymbol || '');
     const [period, setPeriod] = useState('1y');
+
+    // Sync internal state if initialSymbol changes externally (e.g. from URL or Trending click)
+    // Sync internal state if initialSymbol changes externally (e.g. from URL or Trending click)
+    useEffect(() => {
+        if (initialSymbol) {
+            setSymbol(initialSymbol);
+        } else {
+            setSymbol('');
+        }
+    }, [initialSymbol]);
 
     const periods = [
         { value: '1mo', label: '1M' },
