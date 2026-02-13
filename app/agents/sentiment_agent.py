@@ -33,7 +33,7 @@ class SentimentAgent:
             raise ValueError("Groq API key not provided and GROQ_API_KEY environment variable not set")
         
         self.client = Groq(api_key=self.api_key)
-        self.model = "mixtral-8x7b-32768"  # Fast and effective model
+        self.model = "llama-3.3-70b-versatile"  # Updated to supported model
     
     def analyze_sentiment(self, texts: List[str]) -> Dict:
         """

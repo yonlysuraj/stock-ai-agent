@@ -11,6 +11,7 @@ import {
     Shield,
     Zap,
     Newspaper,
+    Sparkles,
 } from 'lucide-react';
 import './AnalysisResult.css';
 import PriceChart from '../PriceChart/PriceChart';
@@ -100,35 +101,50 @@ export default function AnalysisResult({ data, report }) {
 
     return (
         <div className="analysis-result animate-fade-in-up">
-            {/* Header Card */}
-            <div className="result-header-card">
-                <div className="result-header-top">
-                    <div className="result-symbol-group">
-                        <h2 className="result-symbol">{symbol}</h2>
-                        <span className={`action-badge ${actionColor}`}>
-                            <ActionIcon size={14} />
-                            {decision.action}
-                        </span>
-                        <button
-                            type="button"
-                            className={`watchlist-btn ${inWatchlist ? 'added' : ''}`}
-                            onClick={handleAddToWatchlist}
-                            disabled={inWatchlist}
-                        >
-                            {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
-                        </button>
+            <div className="analysis-top-section">
+                {/* AI Advice Card */}
+                {report?.report?.investment_advice && (
+                    <div className="advice-card animate-fade-in-up">
+                        <div className="advice-header">
+                            <Sparkles size={18} className="advice-icon" />
+                            <span className="advice-label">AI Insight</span>
+                        </div>
+                        <p className="advice-content">
+                            {report.report.investment_advice}
+                        </p>
                     </div>
-                    <div className="result-price-group">
-                        <span className="result-price">${current_price?.toFixed(2)}</span>
-                        <span className="result-meta">{price_history_length} data points</span>
-                    </div>
-                </div>
+                )}
 
-                <div className="decision-section">
-                    <div className="decision-reason">{decision.reason}</div>
-                    <div className="confidence-section">
-                        <span className="confidence-label">Confidence</span>
-                        <ConfidenceBar confidence={decision.confidence} />
+                {/* Header Card */}
+                <div className="result-header-card">
+                    <div className="result-header-top">
+                        <div className="result-symbol-group">
+                            <h2 className="result-symbol">{symbol}</h2>
+                            <span className={`action-badge ${actionColor}`}>
+                                <ActionIcon size={14} />
+                                {decision.action}
+                            </span>
+                            <button
+                                type="button"
+                                className={`watchlist-btn ${inWatchlist ? 'added' : ''}`}
+                                onClick={handleAddToWatchlist}
+                                disabled={inWatchlist}
+                            >
+                                {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+                            </button>
+                        </div>
+                        <div className="result-price-group">
+                            <span className="result-price">${current_price?.toFixed(2)}</span>
+                            <span className="result-meta">{price_history_length} data points</span>
+                        </div>
+                    </div>
+
+                    <div className="decision-section">
+                        <div className="decision-reason">{decision.reason}</div>
+                        <div className="confidence-section">
+                            <span className="confidence-label">Confidence</span>
+                            <ConfidenceBar confidence={decision.confidence} />
+                        </div>
                     </div>
                 </div>
             </div>

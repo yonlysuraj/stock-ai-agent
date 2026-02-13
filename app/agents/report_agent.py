@@ -9,6 +9,12 @@ Responsibilities:
 
 from datetime import datetime
 from typing import Dict, Optional
+import os
+from groq import Groq
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 class ReportAgent:
@@ -16,7 +22,18 @@ class ReportAgent:
     
     def __init__(self):
         """Initialize report agent"""
-        self.report_version = "1.1" # Bump version
+        self.report_version = "1.2" # Bump version
+        
+        # Initialize Groq client for AI advice
+        self.api_key = os.getenv("GROQ_API_KEY")
+        self.client = None
+        if self.api_key:
+            try:
+                self.client = Groq(api_key=self.api_key)
+                # Updated to a currently supported model
+                self.model = "llama-3.3-70b-versatile"
+            except Exception as e:
+                print(f"Failed to initialize Groq client in ReportAgent: {e}")
     
     def generate_report(self, ticker: str, analysis_data: dict) -> Dict:
         """
@@ -40,6 +57,7 @@ class ReportAgent:
             - recommendation
             - timestamp
             - risk_assessment
+            - investment_advice (AI generated)
         """
         if not analysis_data or "error" in analysis_data:
             return {
@@ -66,6 +84,9 @@ class ReportAgent:
         
         # Generate recommendation
         recommendation = self._generate_recommendation(decision, tech_analysis, risk_assessment)
+
+        # Generate AI Advice
+        ai_advice = self._generate_ai_advice(ticker, current_price, decision, sentiment, indicators)
         
         return {
             "ticker": ticker.upper(),
@@ -101,10 +122,45 @@ class ReportAgent:
                 },
                 "risk_assessment": risk_assessment,
                 "recommendation": recommendation,
+                "investment_advice": ai_advice,
                 "data_points": data.get("price_history_length", 0)
             }
         }
     
+    def _generate_ai_advice(self, ticker: str, price: float, decision: dict, sentiment: dict, indicators: dict) -> str:
+        """Generate smart investment advice using LLM"""
+        if not self.client:
+            return "AI Advice unavailable (API Key missing)."
+
+        try:
+            prompt = f"""You are an expert senior financial strategist. 
+Based on the following data for {ticker}, provide a detailed, insightful playing strategy analysis.
+
+Data:
+- Price: ${price}
+- Decision: {decision.get('action')} (Confidence: {decision.get('confidence')})
+- Tech Indicators: RSI={indicators.get('rsi')}, MACD={indicators.get('macd')}
+- News Sentiment: {sentiment.get('overall_sentiment')} (Score: {sentiment.get('overall_score')})
+- Risk Analysis: {self._assess_risk(indicators, decision, sentiment).get('level')}
+
+Write a comprehensive paragraph (approx 80-100 words) that:
+1. Synthesizes the technical and sentiment data.
+2. Explains the *why* behind the current market setup.
+3. Provides a clear, actionable strategy for the next 1-2 weeks.
+
+Tone: Professional, analytical, and direct. Avoid generic disclaimers. Do not use markdown formatting.
+"""
+            completion = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=300
+            )
+            return completion.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"Error generating AI advice: {e}")
+            return "AI Advice currently unavailable."
+
     def _generate_summary(self, ticker: str, price: float, decision: dict, sentiment: dict) -> str:
         """Generate a text summary of the analysis"""
         action = decision.get("action", "HOLD")
