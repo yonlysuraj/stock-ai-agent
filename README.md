@@ -1,5 +1,7 @@
 # Stock AI Research Agent 📈🤖
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 A **minimal, production-quality MVP** for AI-powered stock analysis using technical indicators and rule-based trading decisions.
 
 **🎯 Focus**: Clean code, no overengineering, hackathon-ready.
@@ -492,7 +494,9 @@ For detailed instructions on how to deploy this app for free on Vercel, check ou
 
 ## 📝 License
 
-MIT License - Free to use and modify
+Copyright © 2026 [Suraj Mallick](https://github.com/yonlysuraj). All rights reserved.
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
