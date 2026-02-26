@@ -23,12 +23,6 @@
     gap: var(--space-2);
 }
 
-.footer-copyright .heart {
-    color: var(--danger);
-    display: inline-block;
-    animation: heartbeat 1.5s ease-in-out infinite;
-}
-
 .footer-links {
     display: flex;
     align-items: center;
@@ -63,30 +57,6 @@
 .footer-badge:hover {
     background: var(--gray-200);
     color: var(--gray-700);
-}
-
-@keyframes heartbeat {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    15% {
-        transform: scale(1.15);
-    }
-
-    30% {
-        transform: scale(1);
-    }
-
-    45% {
-        transform: scale(1.1);
-    }
-
-    60% {
-        transform: scale(1);
-    }
 }
 
 /* Mobile — keep single line */

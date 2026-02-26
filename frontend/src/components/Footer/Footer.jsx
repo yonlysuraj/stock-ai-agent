@@ -7,7 +7,7 @@ export default function Footer() {
         <footer className="footer">
             <div className="footer-content">
                 <p className="footer-copyright">
-                    © {currentYear} Suraj Mallick · Made with <span className="heart">♥</span>
+                    © {currentYear} Suraj Mallick
                 </p>
 
                 <div className="footer-links">
