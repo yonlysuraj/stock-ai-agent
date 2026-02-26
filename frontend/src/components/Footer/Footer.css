@@ -1,0 +1,120 @@
+.footer {
+    width: 100%;
+    padding: var(--space-6) var(--space-8);
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--white);
+}
+
+.footer-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.footer-copyright {
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.footer-copyright .heart {
+    color: var(--danger);
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.footer-links a {
+    font-size: var(--font-size-sm);
+    color: var(--gray-400);
+    transition: color var(--transition-fast);
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: var(--gray-700);
+}
+
+.footer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px 10px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-fast);
+}
+
+.footer-badge:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(1.15);
+    }
+
+    30% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.1);
+    }
+
+    60% {
+        transform: scale(1);
+    }
+}
+
+/* Mobile — keep single line */
+@media (max-width: 640px) {
+    .footer {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .footer-content {
+        flex-direction: row;
+        justify-content: center;
+        gap: var(--space-2);
+    }
+
+    .footer-copyright {
+        font-size: var(--font-size-xs);
+    }
+
+    .footer-links {
+        gap: var(--space-3);
+    }
+
+    .footer-links a {
+        font-size: var(--font-size-xs);
+    }
+
+    .footer-badge {
+        padding: 1px 6px;
+        font-size: 0.65rem;
+    }
+}
